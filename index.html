@@ -181,8 +181,11 @@ function createDefaultMap() {
         if (y >= 0 && y < rows && x >= 0 && x < cols) m[y][x] = TILE.BRICK;
   }
 
-  // 防区布局
-  addBrickRect(m, 11, 14, 23, 23);  // 底部防线
+  // 防区布局 — 基地正上方保护墙（保留基地两侧通道让玩家可以移动）
+  addBrickRect(m, 12, 13, 23, 23);  // 基地正上方砖墙保护
+  // 在底部清理出通道让玩家和敌人都能进入战场
+  for (let x = 3; x <= 5; x++) { m[23][x] = TILE.EMPTY; }    // 左侧通道
+  for (let x = 20; x <= 22; x++) { m[23][x] = TILE.EMPTY; }   // 右侧通道
   // 对称砖块群
   addBrickRect(m, 5, 7, 6, 8);
   addBrickRect(m, 18, 20, 6, 8);
@@ -425,9 +428,9 @@ class Game {
     this.playerSpawned = false;
     this.spawnTimer = 0;
 
-    // 生成玩家
+    // 生成玩家 — 出生在基地左侧安全区域
     const ts = CONFIG.TILE_SIZE;
-    this.player = new Tank(ts * 12, ts * 24, DIR.UP, true);
+    this.player = new Tank(ts * 3, ts * 24, DIR.UP, true);
     this.player.invincible = CONFIG.SPAWN_INVINCIBLE_FRAMES;
     this.playerSpawned = true;
   }
@@ -793,7 +796,7 @@ class Game {
         const ts = CONFIG.TILE_SIZE;
         setTimeout(() => {
           if (this.gameOver) return;
-          this.player = new Tank(ts * 12, ts * 24, DIR.UP, true);
+          this.player = new Tank(ts * 3, ts * 24, DIR.UP, true);
           this.player.invincible = CONFIG.SPAWN_INVINCIBLE_FRAMES;
           this.playerSpawned = true;
           this.addExplosion(this.player.cx, this.player.cy, true);
